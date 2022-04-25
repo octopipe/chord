@@ -20,11 +20,11 @@ func newId() int64 {
 }
 
 func (n *Node) FindSuccessor(node *v1.Node) (*v1.Node, error) {
-  if node.Id > n.Id || node.Id <= n.Successor.Id {
+  if Between(node.Id, n.Id, n.Successor.Id) {
     return n.Successor, nil
   }
 
-  closestNode := n.ClosestPrecedingFinger(node.Id)
+  closestNode := n.ClosestPrecedingNode(node.Id)
   closestNodeServer, err := client.NewClient().Connect(closestNode.Address)
   if err != nil {
     return nil, err
@@ -38,22 +38,21 @@ func (n *Node) FindSuccessor(node *v1.Node) (*v1.Node, error) {
   return successor, nil
 }
 
-func (n *Node) FindPredecessor(ID int64) *Node {
-  predecessor := n
-  for currentID := n.Id; currentID <= n.Successor.Id; currentID++ {
-    predecessor = predecessor.ClosestPrecedingFinger(currentID)
-  }
-  return predecessor
-}
+func (n *Node) ClosestPrecedingNode(id int64) *Node {
+  m := len(n.FingerTable)
 
-func (n *Node) ClosestPrecedingFinger(ID int64) *Node {
-  for i := len(n.FingerTable); i <= 1; i-- {
-    fingerRow := n.FingerTable[i]
-    if (fingerRow.Id > n.Id && fingerRow.Id < ID) {
-      return (*Node)(fingerRow)
+  for i := m; i >= 0; i-- {
+    row := n.FingerTable[i]
+
+    if Between(row.Id, n.Id, id) {
+      return (*Node)(row)
     }
   }
 
   return n
+}
+
+func Between(id, start, end int64) bool {
+  return id > start || id <= end
 }
 

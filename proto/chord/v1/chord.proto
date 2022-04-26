@@ -3,12 +3,14 @@ D. Ongaro and J. Ousterhout, In Search of an Understandable Consensus Algorithm 
 ?
 */
 syntax = "proto3";
+import "google/protobuf/empty.proto";
 package v1;
 
 option go_package = "./v1";
 
 service Chord {
   rpc FindSuccessor(Node) returns (Node);
+  rpc Notify(Node) returns (google.protobuf.Empty);
 }
 
 message Node {

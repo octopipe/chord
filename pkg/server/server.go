@@ -10,6 +10,7 @@ import (
 	chordPb "github.com/octopipe/chord/proto/chord/v1"
 	v1 "github.com/octopipe/chord/proto/chord/v1"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type Server struct {
@@ -57,5 +58,11 @@ func (s *Server) Join(ctx context.Context, parentNodeAddress string) error {
 
 func (s * Server) FindSuccessor(ctx context.Context, node *v1.Node) (*v1.Node, error) {
   return s.Node.FindSuccessor(node)
+}
+
+
+func (s * Server) Notify(ctx context.Context, node *v1.Node) (*emptypb.Empty, error) {
+  s.Node.Notify(node)
+  return nil, nil
 }
 

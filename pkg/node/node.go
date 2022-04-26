@@ -52,7 +52,31 @@ func (n *Node) ClosestPrecedingNode(id int64) *Node {
   return n
 }
 
+func (n *Node) Notify(node *v1.Node) {
+  predecessor := n.Predeccessor
+  if predecessor == nil || Between(node.Id, predecessor.Id, n.Id) {
+    n.Predeccessor = node
+  }
+}
+
+func (n *Node) stabilize() error {
+  x := n.Successor.Predeccessor
+  if Between(x.Id, n.Id, n.Successor.Id) {
+    n.Successor = x
+  }
+
+  successorServer, err := client.NewClient().Connect(n.Successor.Address)
+  if err != nil {
+    return err
+  }
+
+  _, err = successorServer.Notify(context.Background(), (*v1.Node)(n))
+  return err
+}
+
+
 func Between(id, start, end int64) bool {
   return id > start || id <= end
 }
+
 

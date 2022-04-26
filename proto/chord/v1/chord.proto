@@ -1,7 +1,3 @@
-/*
-D. Ongaro and J. Ousterhout, In Search of an Understandable Consensus Algorithm (Extended Version)[Online]. Available: https://raft.github.io/raft.pdf
-?
-*/
 syntax = "proto3";
 import "google/protobuf/empty.proto";
 package v1;
@@ -20,24 +16,3 @@ message Node {
   Node successor = 4;
   Node predeccessor = 5;
 }
-
-// message AppendEntriesRequest {
-//   int64 term = 1;
-//   bytes leaderId = 2;
-//   int64 prevLogIndex = 3;
-//   int64 prevLogTerm = 4;
-//   repeated bytes entries = 5;
-//   int64 leaderCommit = 6;
-// }
-//
-// message AppendEntriesReply {
-// }
-//
-// message RequestVoteRequest {
-//   int64 term = 1;
-//   bytes candidateid = 2;
-//   int64 lastLogIndex = 3;
-//   int64 lastLogTerm = 4;
-// }
-//
-// message RequestVoteReply {}

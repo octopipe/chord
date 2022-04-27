@@ -2,27 +2,30 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"time"
 
-	"github.com/octopipe/chord/pkg/client"
-	"github.com/octopipe/chord/pkg/node"
-	chordPb "github.com/octopipe/chord/proto/chord/v1"
-	v1 "github.com/octopipe/chord/proto/chord/v1"
+	"github.com/octopipe/dht/pkg/client"
+	"github.com/octopipe/dht/pkg/node"
+	chordPb "github.com/octopipe/dht/proto/chord/v1"
+	v1 "github.com/octopipe/dht/proto/chord/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type Server struct {
   v1.ChordServer
-  Node node.Node
+  Node *node.Node
   Address string
   Client client.Client
 }
 
-func NewServer(address string) *Server {
+func NewServer(node *node.Node, host string, port int) *Server {
   newServer := &Server{
-    Address: address,
+    Address: fmt.Sprintf("%s:%d", host, port),
+    Node: node,
+    Client: client.NewClient(),
   }
 
   return newServer

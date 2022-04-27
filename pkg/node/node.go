@@ -4,14 +4,14 @@ import (
 	"context"
 	"math/rand"
 
-	"github.com/octopipe/chord/pkg/client"
-	v1 "github.com/octopipe/chord/proto/chord/v1"
+	"github.com/octopipe/dht/pkg/client"
+	v1 "github.com/octopipe/dht/proto/chord/v1"
 )
 
 type Node v1.Node
 
-func NewNode() Node {
-  return Node {
+func NewNode() *Node {
+  return &Node {
   }
 }
 

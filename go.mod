@@ -3,7 +3,7 @@ module github.com/octopipe/dht
 go 1.17
 
 require (
-	github.com/octopipe/dht v0.0.0-20220426234704-04c2034266f4
+	github.com/docker/go-connections v0.4.0
 	github.com/testcontainers/testcontainers-go v0.13.0
 	google.golang.org/grpc v1.45.0
 	google.golang.org/protobuf v1.28.0
@@ -18,7 +18,6 @@ require (
 	github.com/containerd/containerd v1.5.9 // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v20.10.11+incompatible // indirect
-	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect

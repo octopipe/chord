@@ -23,5 +23,6 @@ func (c Client) Connect(address string) (chordPb.ChordClient, error) {
     return nil, err
   }
 
-  return chordPb.NewChordClient(conn), nil
+  client := chordPb.NewChordClient(conn)
+  return client, nil
 }

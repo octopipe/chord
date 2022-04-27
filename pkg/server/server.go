@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 	"fmt"
+	"log"
 	"net"
-	"time"
 
 	"github.com/octopipe/dht/pkg/client"
 	"github.com/octopipe/dht/pkg/node"
@@ -21,17 +21,35 @@ type Server struct {
   Client client.Client
 }
 
-func NewServer(node *node.Node, host string, port int) *Server {
+type ServerConfig struct {
+  Node *node.Node
+  IsRoot bool
+  Host string
+  Port int
+  ParentNodeAddress string
+}
+
+func NewServer(config ServerConfig) (*Server, error) {
   newServer := &Server{
-    Address: fmt.Sprintf("%s:%d", host, port),
-    Node: node,
+    Address: fmt.Sprintf("%s:%d", config.Host, config.Port),
+    Node: config.Node,
     Client: client.NewClient(),
   }
 
-  return newServer
+  if config.IsRoot {
+    newServer.Create()
+  } else {
+    err := newServer.Join(context.Background(), config.ParentNodeAddress)
+    if err != nil {
+      return nil, err
+    }
+  }
+
+  return newServer, nil
 }
 
 func (s *Server) StartServer() error {
+  log.Println(fmt.Sprintf("Starting server on %s", s.Address))
   lis, err := net.Listen("tcp", s.Address)
   if err != nil {
     return err
@@ -41,15 +59,20 @@ func (s *Server) StartServer() error {
   return grpcServer.Serve(lis)
 }
 
+func (s *Server) Create() {
+  log.Println("Create network")
+  s.Node.Predeccessor = nil
+  s.Node.Successor = (*v1.Node)(s.Node)
+}
+
 func (s *Server) Join(ctx context.Context, parentNodeAddress string) error {
+  log.Println(fmt.Sprintf("Join to network by %s", parentNodeAddress))
   conn, err := s.Client.Connect(parentNodeAddress)
   if err != nil {
     return err
   }
 
-  ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-  defer cancel()
-  successor, err := conn.FindSuccessor(ctx, &v1.Node{Address: s.Node.Address, Id: s.Node.Id})
+  successor, err := conn.FindSuccessor(ctx, &v1.Node{Address: s.Address, Id: s.Node.Id})
   if err != nil {
     return err
   }

@@ -3,7 +3,7 @@ package test
 import (
 	"context"
 	"fmt"
-	"strconv"
+	"log"
 	"testing"
 	"time"
 
@@ -16,8 +16,8 @@ type ServerContainer struct{
   URI string
 }
 
-func setupServer(ctx context.Context, port int) (*ServerContainer, error) {
-  parsedPort := strconv.Itoa(port)
+func setupServer(ctx context.Context, port int, parent string) (*ServerContainer, error) {
+  parsedPort := fmt.Sprintf("%d/tcp", port)
   dockerfileReq := testcontainers.FromDockerfile {
     Context: "..",
     Dockerfile: "test/sampleserver/Dockerfile",
@@ -28,11 +28,13 @@ func setupServer(ctx context.Context, port int) (*ServerContainer, error) {
     Env: map[string]string{
       "PORT": parsedPort,
       "HOST": "0.0.0.0",
+      "PARENT": parent,
     },
   }
   container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
     ContainerRequest: req,
     Started: true,
+    Logger: log.Default(),
   })
   if err != nil {
     return nil, err
@@ -56,11 +58,18 @@ func setupServer(ctx context.Context, port int) (*ServerContainer, error) {
 
 func TestNewChordNetwork(t *testing.T) {
   ctx := context.Background()
-  ports := []int{8000, 8001}
+  parentNodePort := 8000
+  ports := []int{8001}
   servers := []ServerContainer{}
 
+  _, err := setupServer(ctx, parentNodePort, "")
+  if err != nil {
+    t.Fatal(err)
+  }
+
   for _, port := range ports {
-    srv, err := setupServer(ctx, port)
+    parentAddress := fmt.Sprintf("0.0.0.0:%d", parentNodePort)
+    srv, err := setupServer(ctx, port, parentAddress)
     if err != nil {
       t.Fatal(err)
     }

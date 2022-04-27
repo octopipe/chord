@@ -2,12 +2,13 @@ FROM golang:1.16-alpine
 
 WORKDIR /app
 
-RUN go mod init sampleserver
-RUN go get github.com/octopipe/dht
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
 
-COPY test/sampleserver/*.go ./
+COPY . .
 
-RUN go build -o /server
+RUN go build ./test/sampleserver/*.go
 
 EXPOSE 8080
 
